@@ -161,11 +161,22 @@ class StableVideoDiffusionPipeline(DiffusionPipeline):
 
         return image_embeddings
     
-    def _encode_text(self, text, device):
+    def _encode_text(self, text, device, do_classifier_free_guidance):
         inputs = self.tokenizer(text, padding=True, return_tensors="pt")
         inputs = inputs.to(device=device)
         outputs = self.text_encoder(**inputs)
         text_embeds = outputs.text_embeds
+
+        if do_classifier_free_guidance:
+            negative_text_embeds = torch.zeros_like(negative_text_embeds)
+
+            # For classifier free guidance, we need to do two forward passes.
+            # Here we concatenate the unconditional and text embeddings into a single batch
+            # to avoid doing two forward passes
+            text_embeds = torch.cat([negative_text_embeds, text_embeds])
+
+        return text_embeds
+
         return text_embeds
 
     def _encode_vae_image(
@@ -335,6 +346,7 @@ class StableVideoDiffusionPipeline(DiffusionPipeline):
         callback_on_step_end: Optional[Callable[[int, int, Dict], None]] = None,
         callback_on_step_end_tensor_inputs: List[str] = ["latents"],
         return_dict: bool = True,
+        device:str = 'cuda'
     ):
         r"""
         The call function to the pipeline for generation.
@@ -429,7 +441,7 @@ class StableVideoDiffusionPipeline(DiffusionPipeline):
             batch_size = len(image)
         else:
             batch_size = image.shape[0]
-        device = 'cuda'
+        device = device
         # here `guidance_scale` is defined analog to the guidance weight `w` of equation (2)
         # of the Imagen paper: https://arxiv.org/pdf/2205.11487.pdf . `guidance_scale = 1`
         # corresponds to doing no classifier free guidance.
