@@ -168,7 +168,7 @@ class StableVideoDiffusionPipeline(DiffusionPipeline):
         text_embeds = outputs.text_embeds
 
         if do_classifier_free_guidance:
-            negative_text_embeds = torch.zeros_like(negative_text_embeds)
+            negative_text_embeds = torch.zeros_like(text_embeds)
 
             # For classifier free guidance, we need to do two forward passes.
             # Here we concatenate the unconditional and text embeddings into a single batch
@@ -177,7 +177,6 @@ class StableVideoDiffusionPipeline(DiffusionPipeline):
 
         return text_embeds
 
-        return text_embeds
 
     def _encode_vae_image(
         self,
@@ -451,7 +450,7 @@ class StableVideoDiffusionPipeline(DiffusionPipeline):
         image_embeddings = self._encode_image(image, device, num_videos_per_prompt, self.do_classifier_free_guidance)
 
         # 3b. Encode Text
-        text_embeddings = self._encode_text(text, device)
+        text_embeddings = self._encode_text(text, device, self.do_classifier_free_guidance)
 
         # # 3c. Combine image and text
         image_embeddings = self.encoder_fuser(image_embeddings, text_embeddings, self.do_classifier_free_guidance)
