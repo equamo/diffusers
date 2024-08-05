@@ -2359,7 +2359,7 @@ class CrossAttnUpBlockSpatioTemporal(nn.Module):
             res_hidden_states_tuple = res_hidden_states_tuple[:-1]
 
             print("vars: hidden_states, res_hidden_states, res_hidden_states_tuple")
-            print("dims", hidden_states.shape, res_hidden_states.shape, res_hidden_states_tuple.shape)
+            print("dims", hidden_states.shape, res_hidden_states.shape)
 
             hidden_states = torch.cat([hidden_states, res_hidden_states], dim=1)
 
