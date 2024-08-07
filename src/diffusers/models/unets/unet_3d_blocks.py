@@ -2358,9 +2358,6 @@ class CrossAttnUpBlockSpatioTemporal(nn.Module):
             res_hidden_states = res_hidden_states_tuple[-1]
             res_hidden_states_tuple = res_hidden_states_tuple[:-1]
 
-            print("vars: hidden_states, res_hidden_states, res_hidden_states_tuple")
-            print("dims", hidden_states.shape, res_hidden_states.shape)
-
             hidden_states = torch.cat([hidden_states, res_hidden_states], dim=1)
 
             if self.training and self.gradient_checkpointing:  # TODO
